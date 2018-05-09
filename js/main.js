@@ -39,11 +39,10 @@ function highlight(x){
     d3.select(x.nextElementSibling).style("stroke","black");
 }
 
-function unhighlight(x){
-    d3.select(x).style("stroke","white");
-    d3.select(x.nextElementSibling).style("stroke","white");
+function unhighlight(x) {
+    d3.select(x).style("stroke", "white");
+    d3.select(x.nextElementSibling).style("stroke", "white");
 }
-
 
 // x axis
 g.append("g")
@@ -64,8 +63,8 @@ g.append("g")
 
 
 g.append("text")      // text label for the x axis
-    .attr("x", 150 )
-    .attr("y",  337 )
+    .attr("x", width/2 )
+    .attr("y",  height+32 )
     .style("text-anchor", "middle")
     .text("Easting(km)")
     .attr("class", "axislabel");
