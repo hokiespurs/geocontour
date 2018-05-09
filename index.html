@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+<svg width="800" height="800" stroke="#fff" stroke-width="0.5"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-hsv.v0.1.min.js"></script>
+<script src="https://d3js.org/d3-contour.v1.min.js"></script>
+<script>
+    var ZRANGE = [130, 3500];
+    var dZ = 75;
+    var svg = d3.select("svg"),
+        width = +svg.attr("width"),
+        height = +svg.attr("height");
+
+    var hsvcolor = d3.interpolateHsvLong('#5581ba', '#dcdbdb');
+    var color = d3.scaleSequential(hsvcolor).domain(ZRANGE);
+
+    d3.json("assets/mthood.json", function(error, volcano) {
+        if (error) throw error;
+
+        svg.selectAll("path")
+            .data(d3.contours()
+                .size([volcano.width, volcano.height])
+                .thresholds(d3.range(ZRANGE[0], ZRANGE[1], dZ))
+                (volcano.values))
+            .enter().append("path")
+            .attr("d", d3.geoPath(d3.geoIdentity().scale(width / volcano.width)))
+            .attr("fill", function(d) { return color(d.value); })
+            .on("mouseover", function(d,i){highlight(this);})
+            .on("mouseout", function(d,i){unhighlight(this);});
+    });
+
+    function highlight(x){
+        d3.select(x).style("stroke","black");
+        d3.select(x.nextElementSibling).style("stroke","black");
+    }
+
+    function unhighlight(x){
+        d3.select(x).style("stroke","white");
+        d3.select(x.nextElementSibling).style("stroke","white");
+    }
+
+</script>
+</body>
+</html>
