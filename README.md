@@ -276,7 +276,7 @@ Mike Bostocks has a [heatmap example](https://bl.ocks.org/mbostock/3074470), sim
 
 AxisMaps wrote a really cool blog post about developing [contour maps in the browser](https://www.axismaps.com/blog/2018/04/contours-in-browser/) using elevation tiles and D3. This example with each contour shaded looks awesome.
 > https://www.axismaps.com/blog/2018/04/contours-in-browser/
-![axismaps](https://github.com/hokiespurs/geocontour/blob/master/img/axismaps.png?raw=true)
+![axismaps](https://github.com/hokiespurs/geocontour/blob/master/img/axismaps.PNG?raw=true)
 
 
 
