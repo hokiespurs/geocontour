@@ -3,7 +3,6 @@ var svg = d3.select("svg"),
     margin = {top: 30, right: 30, bottom: 65, left: 65},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom;
-var shift = 40;
 
 var g = svg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -35,6 +34,17 @@ d3.json(FNAME, function(error, mountain) {
         .on("mouseover", function(d,i){highlight(this);})
         .on("mouseout", function(d,i){unhighlight(this);});
 });
+function highlight(x){
+    d3.select(x).style("stroke","black");
+    d3.select(x.nextElementSibling).style("stroke","black");
+}
+
+function unhighlight(x){
+    d3.select(x).style("stroke","white");
+    d3.select(x.nextElementSibling).style("stroke","white");
+}
+
+
 // x axis
 g.append("g")
     .attr("transform", "translate(0," + height + ")")
@@ -69,12 +79,4 @@ g.append("text")
     .text("Northing(km)")
     .attr("class", "axislabel");
 
-function highlight(x){
-    d3.select(x).style("stroke","black");
-    d3.select(x.nextElementSibling).style("stroke","black");
-}
 
-function unhighlight(x){
-    d3.select(x).style("stroke","white");
-    d3.select(x.nextElementSibling).style("stroke","white");
-}
