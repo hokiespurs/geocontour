@@ -113,6 +113,7 @@ Finally, the main.js script is added.
 </html>
 ```
 <hr>
+
 ### JAVASCRIPT
 First, the svg is selected from the DOM, and the margins for the svg are set.
 ```js
@@ -216,6 +217,7 @@ g.append("text")
 ```
 
 <hr>
+
 ### CSS
 A stylesheet is added to style the text and lines on the plot.
 
@@ -264,6 +266,19 @@ text {
 ```
 
 ## 4\. More examples of similiar geovisualizations
+The D3-contour github has other examples, including this one with animated the contours.
+> https://github.com/d3/d3-contour
+![Animated Contours](https://github.com/hokiespurs/geocontour/blob/master/img/volcano.gif?raw=true)
+
+Mike Bostocks has a [heatmap example](https://bl.ocks.org/mbostock/3074470), similar to his contour map.
+> https://bl.ocks.org/mbostock/3074470
+![heatmap](https://github.com/hokiespurs/geocontour/blob/master/img/heatmap.png?raw=true)
+
+AxisMaps wrote a really cool blog post about developing [contour maps in the browser](https://www.axismaps.com/blog/2018/04/contours-in-browser/) using elevation tiles and D3. This example with each contour shaded looks awesome.
+> https://www.axismaps.com/blog/2018/04/contours-in-browser/
+![axismaps](https://github.com/hokiespurs/geocontour/blob/master/img/axismaps.png?raw=true)
+
+
 
 ## Acknowledgement
 - [D3.js](https://d3js.org/) (Mike Bostocks)
