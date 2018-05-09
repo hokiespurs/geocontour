@@ -6,7 +6,17 @@
 This module generates a contour map from gridded 2D elevation data using the D3 contour javascript library.  This code is based on the [bl.ocks example](https://bl.ocks.org/mbostock/4241134) by Mike Bostocks.
 
 ## 1\. Set up the workspace
-
+The basic folder structure to generate a contour plot should be as follows:
+```
+|-- geocontour
+    |-- index.html
+    |-- assets
+    |   |-- mthood.json
+    |-- css
+    |   |-- main.css
+    |-- js
+    |   |-- main.js
+```
 ## 2\. Data Sources
 Elevation geotiff data can be downloaded from the USGS tool, [Earth Explorer](https://earthexplorer.usgs.gov/).  Following the instructions on the webpage:
 - draw a bounding box for your area of interest
@@ -55,19 +65,6 @@ The xi and yi variables printed to the screen represent UTM coordinates for the 
 * Here, zNN represents the z elevation of the 100th row and 100th column.
 
 ## 3\. A function-by-function Tutorial
-### Folder Structure
-The basic folder structure to generate a contour plot should be as follows:
-```
-|-- geocontour
-    |-- index.html
-    |-- assets
-    |   |-- mthood.json
-    |-- css
-    |   |-- main.css
-    |-- js
-    |   |-- main.js
-```
-<hr>
 
 ### HTML
 The html document should first call the relevant libraries, and title the document.
