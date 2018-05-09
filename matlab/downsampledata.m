@@ -9,10 +9,10 @@ X = hood(1+OFFSET:m-OFFSET,1+OFFSET:n-OFFSET);
 sX = imresize(X,[100,100]);
 
 %% Export Data as 100x100 Json
-fid = fopen('mthood.json','w+t');
+fid = fopen('../assets/mthood.json','w+t');
 fprintf(fid,'{"width":100,"height":100,"values":[');
-fprintf(fid,'%i,',sX(1:end-1));
-fprintf(fid,'%i]}',sX(end));
+fprintf(fid,'%.1f,',sX(1:end-1));
+fprintf(fid,'%.1f]}',sX(end));
 fclose(fid);
 
 %% Get X and Y coords
@@ -25,8 +25,8 @@ yi = linspace(y(1),y(2),n);
 xis = xi(1+OFFSET:m-OFFSET);
 yis = yi(1+OFFSET:m-OFFSET);
 
-fprintf('var xi = [%.2f, %.2f];\n',xis(1),xis(end));
-fprintf('var yi = [%.2f, %.2f];\n',yis(1),yis(end));
+fprintf('var xi = [%.2f, %.2f];\n',xis(1)/1000,xis(end)/1000);
+fprintf('var yi = [%.2f, %.2f];\n',yis(1)/1000,yis(end)/1000);
 
 %% Plot Data
 figure(1);clf

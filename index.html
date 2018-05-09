@@ -2,102 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="css/main.css" />
     <title>Mount Hood D3 Contours</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3-hsv.v0.1.min.js"></script>
+    <script src="https://d3js.org/d3-contour.v1.min.js"></script>
 </head>
 
 <body>
 <svg width="400" height="400" stroke="#fff" stroke-width="0.5">
     <rect x="65" y="30" width="305" height="305" stroke="#5581ba" fill="white"/>
 </svg>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="https://d3js.org/d3-hsv.v0.1.min.js"></script>
-<script src="https://d3js.org/d3-contour.v1.min.js"></script>
+
 <script>
+    // CONSTANTS
     var ZRANGE = [1100, 3500];
     var dZ = 75;
-    var svg = d3.select("svg"),
-        margin = {top: 30, right: 30, bottom: 65, left: 65},
-        width = +svg.attr("width") - margin.left - margin.right,
-        height = +svg.attr("height") - margin.top - margin.bottom;
-    var shift = 40;
-    
-    var g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    var hsvcolor = d3.interpolateHsvLong('#5581ba', '#dcdbdb');
-    var color = d3.scaleSequential(hsvcolor).domain(ZRANGE);
-
     var xi = [598.80121, 605.26936];   // Easting (km)
     var yi = [5020.50918, 5030.00915]; // Northing (km)
-
-    var x = d3.scaleLinear()
-        .range([0, width])
-        .domain(xi);
-    var y = d3.scaleLinear()
-        .range([0, height])
-        .domain(yi);
-
-
-
-    d3.json("assets/mthood.json", function(error, mountain) {
-        if (error) throw error;
-
-        g.selectAll("path")
-            .data(d3.contours()
-                .size([mountain.width, mountain.height])
-                .thresholds(d3.range(ZRANGE[0], ZRANGE[1], dZ))
-                (mountain.values))
-            .enter().append("path")
-            .attr("d", d3.geoPath(d3.geoIdentity().scale((width) / mountain.width)))
-            .attr("fill", function(d) { return color(d.value); })
-            .on("mouseover", function(d,i){highlight(this);})
-            .on("mouseout", function(d,i){unhighlight(this);});
-    });
-    // x axis
-    g.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x).ticks(5))
-        .attr("class", "axis axis--x");
-
-    // y axis
-    g.append("g")
-        .attr("transform", "translate(0,0)")
-        .call(d3.axisLeft(y).ticks(5))
-        .attr("class", "axis axis--y")
-        .selectAll("text")
-            .style("text-anchor", "end")
-            .attr("dx", "3em")
-            .attr("dy", "-1em")
-            .attr("transform", "rotate(-90)")
-
-
-    g.append("text")      // text label for the x axis
-        .attr("x", 150 )
-        .attr("y",  337 )
-        .style("text-anchor", "middle")
-        .text("Easting(km)")
-        .attr("class", "axislabel");
-
-    g.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", - 45)
-        .attr("x",0 - (height / 2))
-        .attr("dy", "1em")
-        .style("text-anchor", "middle")
-        .text("Northing(km)")
-        .attr("class", "axislabel");
-
-    function highlight(x){
-        d3.select(x).style("stroke","black");
-        d3.select(x.nextElementSibling).style("stroke","black");
-    }
-
-    function unhighlight(x){
-        d3.select(x).style("stroke","white");
-        d3.select(x.nextElementSibling).style("stroke","white");
-    }
-
+    var FNAME = "assets/mthood.json";
 </script>
+<script src="js/main.js"></script>
+
 </body>
 </html>
