@@ -15,6 +15,19 @@ fprintf(fid,'%i,',sX(1:end-1));
 fprintf(fid,'%i]}',sX(end));
 fclose(fid);
 
+%% Get X and Y coords
+[a,b,c] = geotiffread(FNAME);
+[x,y,zone]=deg2utm(c(:,2),c(:,1));
+
+xi = linspace(x(1),x(2),m);
+yi = linspace(y(1),y(2),n);
+
+xis = xi(1+OFFSET:m-OFFSET);
+yis = yi(1+OFFSET:m-OFFSET);
+
+fprintf('var xi = [%.2f, %.2f];\n',xis(1),xis(end));
+fprintf('var yi = [%.2f, %.2f];\n',yis(1),yis(end));
+
 %% Plot Data
 figure(1);clf
 subplot(2,1,1);
