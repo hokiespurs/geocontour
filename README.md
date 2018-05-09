@@ -1,12 +1,22 @@
 # geocontour
-**2D Contour** | **May 9, 2018** | **Elevation Data as JSON** | **Contributors:** [Richie Slocum](https://github.com/hokiespurs)
+**2D Contour Map** | **May 9, 2018** | **Elevation Data as JSON** | **Contributors:** [Richie Slocum](https://github.com/hokiespurs)
 
 ![mthood](https://github.com/hokiespurs/geocontour/blob/master/img/hood.gif?raw=true)
 
 This module generates a contour map from gridded 2D elevation data using the D3 contour javascript library.  This code is based on the [bl.ocks example](https://bl.ocks.org/mbostock/4241134) by Mike Bostocks.
 
 ## 1\. Set up the workspace
-
+The basic folder structure to generate a contour plot should be as follows:
+```
+|-- geocontour
+    |-- index.html
+    |-- assets
+    |   |-- mthood.json
+    |-- css
+    |   |-- main.css
+    |-- js
+    |   |-- main.js
+```
 ## 2\. Data Sources
 Elevation geotiff data can be downloaded from the USGS tool, [Earth Explorer](https://earthexplorer.usgs.gov/).  Following the instructions on the webpage:
 - draw a bounding box for your area of interest
@@ -55,19 +65,6 @@ The xi and yi variables printed to the screen represent UTM coordinates for the 
 * Here, zNN represents the z elevation of the 100th row and 100th column.
 
 ## 3\. A function-by-function Tutorial
-### Folder Structure
-The basic folder structure to generate a contour plot should be as follows:
-```
-|-- geocontour
-    |-- index.html
-    |-- assets
-    |   |-- mthood.json
-    |-- css
-    |   |-- main.css
-    |-- js
-    |   |-- main.js
-```
-<hr>
 
 ### HTML
 The html document should first call the relevant libraries, and title the document.
@@ -116,8 +113,110 @@ Finally, the main.js script is added.
 </html>
 ```
 <hr>
-### JAVASCRIPT
 
+### JAVASCRIPT
+First, the svg is selected from the DOM, and the margins for the svg are set.
+```js
+var svg = d3.select("svg"),
+    margin = {top: 30, right: 30, bottom: 65, left: 65},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom;
+```
+
+The margin is applied to the svg via a "g" group element, which has a translate property associated with the left and top margins.
+```js
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+```
+
+The colorscale is added to linearly interpolate through the HSV colorspace.
+```js
+var hsvcolor = d3.interpolateHsvLong('#5581ba', '#dcdbdb');
+var color = d3.scaleSequential(hsvcolor).domain(ZRANGE);
+```
+
+The x and y axis are set based on the width and height of the plot, respectively, using the `.range([min max])` command.
+The x and y axis domain (real units) are set with the `domain([min max])` command, using the xi and yi variables defined in the `index.html` file.
+```js
+var x = d3.scaleLinear()
+    .range([0, width])
+    .domain(xi);
+var y = d3.scaleLinear()
+    .range([0, height])
+    .domain(yi);
+```
+
+The `d3.json` function is used to load the json values.  The d3.contours is then used to draw the contours for all the the json data using the width and height fields of the json to define the structure.  For each contour, a new path is appended, and styled so that the color is filled based on the colormap previously defined as `color`.
+```js
+d3.json(FNAME, function(error, mountain) {
+    if (error) throw error;
+
+    g.selectAll("path")
+        .data(d3.contours()
+            .size([mountain.width, mountain.height])
+            .thresholds(d3.range(ZRANGE[0], ZRANGE[1], dZ))
+            (mountain.values))
+        .enter().append("path")
+        .attr("d", d3.geoPath(d3.geoIdentity().scale((width) / mountain.width)))
+        .attr("fill", function(d) { return color(d.value); })
+```
+
+The mouseover and mouseout events are programmed to call the highlight and unhighlight functions, which change the fill color and stroke color of the contour that is selected.  The nextElementSibling command is used so that the edge color of the next inner contour is also set to black.
+```js
+    g.selectAll("path")
+    // omitting code shown above
+        .on("mouseover", function(d,i){highlight(this);})
+        .on("mouseout", function(d,i){unhighlight(this);});
+});
+function highlight(x){
+    d3.select(x).style("stroke","black");
+    d3.select(x.nextElementSibling).style("stroke","black");
+}
+
+function unhighlight(x){
+    d3.select(x).style("stroke","white");
+    d3.select(x.nextElementSibling).style("stroke","white");
+}
+```
+
+The axes are set using standard calls to rotate and position the labels
+```js
+// x axis
+g.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x).ticks(5))
+    .attr("class", "axis axis--x");
+
+// y axis
+g.append("g")
+    .attr("transform", "translate(0,0)")
+    .call(d3.axisLeft(y).ticks(5))
+    .attr("class", "axis axis--y")
+    .selectAll("text")
+    .style("text-anchor", "end")
+    .attr("dx", "3em")
+    .attr("dy", "-1em")
+    .attr("transform", "rotate(-90)");
+
+
+g.append("text")      // text label for the x axis
+    .attr("x", 150 )
+    .attr("y",  337 )
+    .style("text-anchor", "middle")
+    .text("Easting(km)")
+    .attr("class", "axislabel");
+
+g.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", - 45)
+    .attr("x",0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Northing(km)")
+    .attr("class", "axislabel");
+```
+
+<hr>
 
 ### CSS
 A stylesheet is added to style the text and lines on the plot.
@@ -167,6 +266,19 @@ text {
 ```
 
 ## 4\. More examples of similiar geovisualizations
+The D3-contour github has other examples, including this one with animated the contours.
+> https://github.com/d3/d3-contour
+![Animated Contours](https://github.com/hokiespurs/geocontour/blob/master/img/volcano.gif?raw=true)
+
+Mike Bostocks has a [heatmap example](https://bl.ocks.org/mbostock/3074470), similar to his contour map.
+> https://bl.ocks.org/mbostock/3074470
+![heatmap](https://github.com/hokiespurs/geocontour/blob/master/img/heatmap.png?raw=true)
+
+AxisMaps wrote a really cool blog post about developing [contour maps in the browser](https://www.axismaps.com/blog/2018/04/contours-in-browser/) using elevation tiles and D3. This example with each contour shaded looks awesome.
+> https://www.axismaps.com/blog/2018/04/contours-in-browser/
+![axismaps](https://github.com/hokiespurs/geocontour/blob/master/img/axismaps.png?raw=true)
+
+
 
 ## Acknowledgement
 - [D3.js](https://d3js.org/) (Mike Bostocks)
