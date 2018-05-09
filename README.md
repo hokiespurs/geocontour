@@ -1,5 +1,5 @@
 # geocontour
-**2D Contour** | **May 9, 2018** | **Elevation Data as JSON** | **Contributors:** [Richie Slocum](https://github.com/hokiespurs)
+**2D Contour Map** | **May 9, 2018** | **Elevation Data as JSON** | **Contributors:** [Richie Slocum](https://github.com/hokiespurs)
 
 ![mthood](https://github.com/hokiespurs/geocontour/blob/master/img/hood.gif?raw=true)
 
@@ -114,8 +114,108 @@ Finally, the main.js script is added.
 ```
 <hr>
 ### JAVASCRIPT
+First, the svg is selected from the DOM, and the margins for the svg are set.
+```js
+var svg = d3.select("svg"),
+    margin = {top: 30, right: 30, bottom: 65, left: 65},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom;
+```
+
+The margin is applied to the svg via a "g" group element, which has a translate property associated with the left and top margins.
+```js
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+```
+
+The colorscale is added to linearly interpolate through the HSV colorspace.
+```js
+var hsvcolor = d3.interpolateHsvLong('#5581ba', '#dcdbdb');
+var color = d3.scaleSequential(hsvcolor).domain(ZRANGE);
+```
+
+The x and y axis are set based on the width and height of the plot, respectively, using the `.range([min max])` command.
+The x and y axis domain (real units) are set with the `domain([min max])` command, using the xi and yi variables defined in the `index.html` file.
+```js
+var x = d3.scaleLinear()
+    .range([0, width])
+    .domain(xi);
+var y = d3.scaleLinear()
+    .range([0, height])
+    .domain(yi);
+```
+
+The `d3.json` function is used to load the json values.  The d3.contours is then used to draw the contours for all the the json data using the width and height fields of the json to define the structure.  For each contour, a new path is appended, and styled so that the color is filled based on the colormap previously defined as `color`.
+```js
+d3.json(FNAME, function(error, mountain) {
+    if (error) throw error;
+
+    g.selectAll("path")
+        .data(d3.contours()
+            .size([mountain.width, mountain.height])
+            .thresholds(d3.range(ZRANGE[0], ZRANGE[1], dZ))
+            (mountain.values))
+        .enter().append("path")
+        .attr("d", d3.geoPath(d3.geoIdentity().scale((width) / mountain.width)))
+        .attr("fill", function(d) { return color(d.value); })
+```
+
+The mouseover and mouseout events are programmed to call the highlight and unhighlight functions, which change the fill color and stroke color of the contour that is selected.  The nextElementSibling command is used so that the edge color of the next inner contour is also set to black.
+```js
+    g.selectAll("path")
+    // omitting code shown above
+        .on("mouseover", function(d,i){highlight(this);})
+        .on("mouseout", function(d,i){unhighlight(this);});
+});
+function highlight(x){
+    d3.select(x).style("stroke","black");
+    d3.select(x.nextElementSibling).style("stroke","black");
+}
+
+function unhighlight(x){
+    d3.select(x).style("stroke","white");
+    d3.select(x.nextElementSibling).style("stroke","white");
+}
+```
+
+The axes are set using standard calls to rotate and position the labels
+```js
+// x axis
+g.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x).ticks(5))
+    .attr("class", "axis axis--x");
+
+// y axis
+g.append("g")
+    .attr("transform", "translate(0,0)")
+    .call(d3.axisLeft(y).ticks(5))
+    .attr("class", "axis axis--y")
+    .selectAll("text")
+    .style("text-anchor", "end")
+    .attr("dx", "3em")
+    .attr("dy", "-1em")
+    .attr("transform", "rotate(-90)");
 
 
+g.append("text")      // text label for the x axis
+    .attr("x", 150 )
+    .attr("y",  337 )
+    .style("text-anchor", "middle")
+    .text("Easting(km)")
+    .attr("class", "axislabel");
+
+g.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", - 45)
+    .attr("x",0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Northing(km)")
+    .attr("class", "axislabel");
+```
+
+<hr>
 ### CSS
 A stylesheet is added to style the text and lines on the plot.
 
